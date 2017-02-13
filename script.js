@@ -1,3 +1,16 @@
+// settings
+var roundsToWin = 3;
+var countdownFrom = 5;
+var newRoundStartsIn = 6000;
+var newRoundStartsInFromSnap= 4000;
+var pcCallsIn = 2000;
+var countdownSpeed = 500;
+
+// timers
+var newRoundTimer = undefined;
+var pcCallSnapTimer = undefined;
+var countdownTimer = undefined;
+
 // define players
 var user = {
 	name: 'user',
@@ -12,11 +25,32 @@ var pc = {
 };
 
 // define our emojis
-var emojis = ['😚','😁','🔫','🍰','🐶','🐱'];
-var kisser = '😚';
+var emojis = ['🃏','😁','🔫','🍰','🐶','🐱'];
+var joker = '🃏';
 
 // define state
 var currentRound = 0;
+var count = countdownFrom;
+
+var start = function() {
+	countdown();
+};
+
+var countdown = function () {
+	if (count != 0) {
+		console.clear();
+		console.log('count: ', count);
+	}
+
+	if (count <= 0) {
+		count = countdownFrom;
+		startNextRound();
+		return;
+	} else {
+		countdownTimer = setTimeout(countdown, countdownSpeed);
+	}
+	count --;
+};
 
 var startNextRound = function () {
 	// pc and user to be assigned a random emoji each
@@ -29,8 +63,24 @@ var startNextRound = function () {
 	user.currentEmoji = getRandomEmoji();
 	pc.currentEmoji = getRandomEmoji();
 
+	// pc calls snap
+	if (isAMatch()) {
+		pcCallSnapTimer = setTimeout(function () {
+			snap(true);
+		}, pcCallsIn);
+	}
+
+	newRoundTimer = setTimeout(countdown, newRoundStartsIn);
+
 	console.log('emojis', pc.currentEmoji, 'vs', user.currentEmoji);
 };
+
+var isAMatch = function () {
+	if (user.currentEmoji == joker || pc.currentEmoji == joker) {
+		return true;
+	}
+	return pc.currentEmoji == user.currentEmoji;
+}
 
 var getRandomEmoji = function () {
 	var randomNumber = Math.round(Math.random() * (emojis.length - 1));
@@ -41,7 +91,7 @@ var getRandomEmoji = function () {
 
 var snap = function (pcCalledSnap) {
 	// compare between the 2 emojis
-	// if it's a kisser then snap is true
+	// if it's a joker then snap is true
 	// if snap is true then the user/pc getins +1 to roundsWon
 	// if user gets it wrong then pc gets +1 to roundsWon
 	// notify of what just happened - console/ui/html
@@ -51,11 +101,9 @@ var snap = function (pcCalledSnap) {
 		return false;
 	}
 
-	var snap = user.currentEmoji == pc.currentEmoji;
+	clearTimeout(newRoundTimer);
 
-	if (user.currentEmoji == kisser || pc.currentEmoji == kisser) {
-		snap = true;
-	}
+	var snap = isAMatch();
 
 	console.group('Snap called by: ' + (pcCalledSnap ? 'PC' : 'User'));
 
@@ -85,12 +133,14 @@ var snap = function (pcCalledSnap) {
 	user.currentEmoji = undefined;
 	pc.currentEmoji = undefined;
 
-	if (user.roundsWon == 3) {
+	if (user.roundsWon == roundsToWin) {
 		console.log('user won the game!!');
 		console.log('game over');
-	} else if (pc.roundsWon == 4) {
+	} else if (pc.roundsWon == roundsToWin) {
 		console.log('pc won the game!!');
 		console.log('game over');
+	} else {
+		newRoundTimer = setTimeout(countdown, newRoundStartsInFromSnap);
 	}
 
 	console.groupEnd();
