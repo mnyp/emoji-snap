@@ -22,6 +22,10 @@ var startNextRound = function () {
 	// pc and user to be assigned a random emoji each
 	// increment round (round +1)
 	currentRound ++;
+
+	console.log('Round', currentRound);
+
+	// Set user emojis
 	user.currentEmoji = getRandomEmoji();
 	pc.currentEmoji = getRandomEmoji();
 
@@ -76,8 +80,18 @@ var snap = function (pcCalledSnap) {
 		}
 	}
 
+	console.log('User: ', user.roundsWon, 'PC: ', pc.roundsWon);
+
 	user.currentEmoji = undefined;
 	pc.currentEmoji = undefined;
+
+	if (user.roundsWon == 3) {
+		console.log('user won the game!!');
+		console.log('game over');
+	} else if (pc.roundsWon == 4) {
+		console.log('pc won the game!!');
+		console.log('game over');
+	}
 
 	console.groupEnd();
 };
