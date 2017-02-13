@@ -42,6 +42,11 @@ var snap = function (pcCalledSnap) {
 	// if user gets it wrong then pc gets +1 to roundsWon
 	// notify of what just happened - console/ui/html
 
+	// check for undefined emojis
+	if (pc.currentEmoji == undefined || user.currentEmoji == undefined) {
+		return false;
+	}
+
 	var snap = user.currentEmoji == pc.currentEmoji;
 
 	if (user.currentEmoji == kisser || pc.currentEmoji == kisser) {
@@ -70,6 +75,9 @@ var snap = function (pcCalledSnap) {
 			console.log('user lost the round');
 		}
 	}
+
+	user.currentEmoji = undefined;
+	pc.currentEmoji = undefined;
 
 	console.groupEnd();
 };
